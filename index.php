@@ -4,7 +4,15 @@ require_once './php/connection.php';
 
 $con = connection();
 
-$sql = "SELECT ProductID, ProductName, UnitsInStock FROM northwind.products";
+$sql = "SELECT pro.ProductID, cat.CategoryName, pro.UnitPrice
+FROM products AS pro
+JOIN categories AS cat
+ON(pro.CategoryID = cat.CategoryID)
+WHERE pro.UnitPrice > (
+    SELECT AVG(p.UnitPrice)
+    FROM products AS p
+    WHERE p.CategoryID = pro.CategoryID
+);";
 $query = mysqli_query($con, $sql);
 
 
@@ -38,16 +46,16 @@ $query = mysqli_query($con, $sql);
             <thead>
                 <tr>
                     <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Units In Stock</th>
+                    <th>Category Name</th>
+                    <th>Unit Price</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($row = mysqli_fetch_array($query)): ?>
                     <tr>
                         <td><?= $row['ProductID'] ?></td>
-                        <td><?= $row['ProductName'] ?></td>
-                        <td><?= $row['UnitsInStock'] ?></td>
+                        <td><?= $row['CategoryName'] ?></td>
+                        <td><?= $row['UnitPrice'] ?></td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
